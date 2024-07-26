@@ -196,21 +196,20 @@
       var currentPage = 1;
       const range = document.getElementById('myRange');
       const errorField = document.getElementById('errorField');
-
+      var isInfiniteScrolling = true;
       jQuery(function ($) {
         $('.table-contain').on('scroll', function () {
           if (
             $(this).scrollTop() + $(this).innerHeight() >=
             $(this)[0].scrollHeight
           ) {
-            console.log('JQuery');
-            fetchNextPage();
+            if (isInfiniteScrolling) fetchNextPage();
           }
         });
       });
 
       function fetchNextPage() {
-        console.log('nextPage');
+        isInfiniteScrolling = false;
 
         fetch(`/loadUser?page=${currentPage}&error=${errorField.value}`, {
           method: 'GET',
@@ -227,6 +226,7 @@
               }
             });
           }
+          isInfiniteScrolling = true;
         });
         currentPage++;
       }
