@@ -196,7 +196,10 @@
       var currentPage = 1;
       const range = document.getElementById('myRange');
       const errorField = document.getElementById('errorField');
+      const seedField = document.getElementById('seed');
+      const regionField = document.getElementById('country-region');
       var isInfiniteScrolling = true;
+
       jQuery(function ($) {
         $('.table-contain').on('scroll', function () {
           if (
@@ -211,13 +214,16 @@
       function fetchNextPage() {
         isInfiniteScrolling = false;
 
-        fetch(`/loadUser?page=${currentPage}&error=${errorField.value}`, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }).then(function (response) {
+        fetch(
+          `/loadUser?page=${currentPage}&error=${errorField.value}&seed=${seedField.value}&country-region=${regionField.value}`,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }
+        ).then(function (response) {
           if (response.ok) {
             response.json().then((res) => {
               console.log(res);

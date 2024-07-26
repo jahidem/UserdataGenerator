@@ -38,8 +38,13 @@ public class UserController {
 
   @GetMapping("/loadUser")
   public ResponseEntity<List<UserDto>> getUserController(
+      @RequestParam(name = "country-region", required = false, defaultValue = "en-US") String countryRegion,
       @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+      @RequestParam(name = "seed", required = false, defaultValue = "0") long seed,
+      @RequestParam(name = "error", required = false, defaultValue = "0") double error,
       Model model) {
+    userService.initialize(countryRegion.substring(0, 2),
+        countryRegion.substring(3, 5), seed, error);
     return ResponseEntity.ok(userService.getUserPage(page));
   }
 
