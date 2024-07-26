@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta
+      http-equiv="Content-Type"
+      content="text/html; charset=UTF-8" />
+    <style th:inline="text">
+      body {
+        margin-right: auto;
+        margin-left: auto;
+        max-width: 1350px;
+      }
+      /* Style the table */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        overflow-y: auto;
+      }
+
+      /* Style table headers */
+      th {
+        padding: 10px;
+        text-align: left;
+        background-color: #f2f2f2;
+        border: 1px solid #333; /* Dark blue border */
+      }
+
+      /* Style table data */
+      td {
+        padding: 5px;
+        border: 1px solid #333; /* Dark blue border */
+      }
+
+      /* Responsive design for table */
+      @media only screen and (max-width: 600px) {
+        /* Adjust table layout for smaller screens */
+        table {
+          border: 0;
+        }
+
+        thead {
+          display: none;
+        }
+
+        tr {
+          margin-left: 0;
+          border-bottom: 1px solid #333; /* Dark blue border for rows */
+        }
+
+        th,
+        td {
+          display: block;
+          width: 100%;
+        }
+
+        th {
+          font-weight: bold;
+          background-color: #f2f2f2;
+          padding: 10px;
+          text-align: left;
+          border: none;
+        }
+      }
+    </style>
+  </head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <body>
+    <form
+      action="/home"
+      method="GET"
+      id="homeForm">
+      <div
+        style="
+          display: flex;
+          height: 3rem;
+          align-items: center;
+          margin-top: 2rem;
+        ">
+        <div style="margin-right: 2rem">
+          <label
+            for="country-region"
+            style="font-weight: bold"
+            >Region:</label
+          >
+          <select
+            id="country-region"
+            name="country-region"
+            onchange="document.getElementById('homeForm').submit()">
+            <option
+              value="en-US"
+              th:selected="${currentCountryRegion == 'en-US'}">
+              English(US)
+            </option>
+            <option
+              value="th-TH"
+              th:selected="${currentCountryRegion == 'th-TH'}">
+              ไทย(ประเทศไทย)
+            </option>
+            <option
+              value="es-MX"
+              th:selected="${currentCountryRegion == 'es-MX'}">
+              Español(México)
+            </option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column">
+          <div>
+            <label
+              for="seed"
+              style="font-weight: bold"
+              >Seed:</label
+            >
+            <input
+              type="number"
+              id="seed"
+              name="seed"
+              onchange="document.getElementById('homeForm').submit()"
+              th:value="${seed}" />
+
+            <button
+              type="button"
+              onclick="generateRandomSeed()">
+              Random
+            </button>
+          </div>
+        </div>
+      </div>
+      <h3>Choose error</h3>
+      <div
+        style="
+          display: flex;
+          width: 100%;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+        ">
+        <div style="display: flex; width: 100%">
+          <div>
+            <input
+              type="number"
+              id="errorField"
+              name="error"
+              style="margin-right: 2rem"
+              onchange="document.getElementById('homeForm').submit()"
+              th:value="${error}" />
+          </div>
+          <input
+            style="width: 24rem"
+            type="range"
+            min="1"
+            max="10"
+            step="0.5"
+            id="myRange"
+            th:value="${error}" />
+        </div>
+        <button onclick="downloadAsCSV()">Download as CSV</button>
+      </div>
+    </form>
+    <div
+      class="table-contain"
+      style="overflow: scroll; max-height: calc(100vh - 16rem)">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>ID Number</th>
+            <th>Full Name</th>
+            <th>Full Address</th>
+            <th>Phone Number</th>
+          </tr>
+        </thead>
+        <tbody id="data-table">
+          <tr th:each="user , status: ${userList}">
+            <td><th:block th:text="${status.index + 1}" /></td>
+            <td th:text="${user.peselNumber}" />
+            <td th:text="${user.fullName}" />
+            <td th:text="${user.fullAddress}" />
+            <td th:text="${user.phoneNumber}" />
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: center">
+      <p style="color: gray">
+        Copyright©
+        <a
+          style="color: blue"
+          href="https://github.com/jahidem"
+          >jahidem</a
+        >
+      </p>
+    </div>
+
+    <script>
+      var currentPage = 1;
+      const range = document.getElementById('myRange');
+      const errorField = document.getElementById('errorField');
+
+      jQuery(function ($) {
+        $('.table-contain').on('scroll', function () {
+          if (
+            $(this).scrollTop() + $(this).innerHeight() >=
+            $(this)[0].scrollHeight
+          ) {
+            console.log('JQuery');
+            fetchNextPage();
+          }
+        });
+      });
+
+      function fetchNextPage() {
+        console.log('nextPage');
+
+        fetch(`/loadUser?page=${currentPage}&error=${errorField.value}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }).then(function (response) {
+          if (response.ok) {
+            response.json().then((res) => {
+              console.log(res);
+              for (let i = 0; i < res.length; i++) {
+                addUser(res[i]);
+              }
+            });
+          }
+        });
+        currentPage++;
+      }
+
+      function addUser(user) {
+        console.log(user);
+
+        $('#data-table').append(
+          '<tr>' +
+            '<td>' +
+            user.index +
+            '</td>\n' +
+            '<td >' +
+            user.peselNumber +
+            '</td>\n' +
+            '<td >' +
+            user.fullName +
+            '</td>\n' +
+            '<td >' +
+            user.fullAddress +
+            '</td>\n' +
+            '<td >' +
+            user.phoneNumber +
+            '</td>' +
+            '</tr>'
+        );
+      }
+      function generateRandomSeed() {
+        const randomSeed = Math.floor(Math.random() * 1000000); // Generate a random number between 0 and 999999
+        document.getElementById('seed').value = randomSeed;
+        document.getElementById('homeForm').submit();
+      }
+      function submitError() {
+        document.getElementById('homeForm').submit();
+      }
+
+      range.addEventListener('input', () => {
+        errorField.value = range.value;
+        submitError();
+      });
+
+      errorField.addEventListener('input', () => {
+        range.value = Math.min(Math.round(errorField.value), 10);
+      });
+
+      function downloadAsCSV() {
+        let data = '';
+        const tableData = [];
+        const rows = document.querySelectorAll('table tr');
+        for (const row of rows) {
+          const rowData = [];
+          for (const [index, column] of row
+            .querySelectorAll('th, td')
+            .entries()) {
+            rowData.push('"' + column.innerText + '"');
+          }
+          tableData.push(rowData.join(','));
+        }
+        data += tableData.join('\n');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([data], { type: 'text/csv' }));
+        a.setAttribute('download', 'data.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  </body>
+</html>
