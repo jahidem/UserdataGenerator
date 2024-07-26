@@ -24,10 +24,9 @@ public class UserController {
       @RequestParam(name = "error", required = false, defaultValue = "0") double error,
 
       Model model) {
-    userService.initialize(countryRegion.substring(0, 2),
-        countryRegion.substring(3, 5), seed, error);
-    List<UserDto> userList = userService.getInitialUserList();
 
+    List<UserDto> userList = userService.getUser(countryRegion.substring(0, 2),
+        countryRegion.substring(3, 5), seed, error, 0, 20);
     model.addAttribute("currentCountryRegion", countryRegion);
     model.addAttribute("seed", seed);
     model.addAttribute("error", error);
@@ -43,9 +42,8 @@ public class UserController {
       @RequestParam(name = "seed", required = false, defaultValue = "0") long seed,
       @RequestParam(name = "error", required = false, defaultValue = "0") double error,
       Model model) {
-    userService.initialize(countryRegion.substring(0, 2),
-        countryRegion.substring(3, 5), seed, error);
-    return ResponseEntity.ok(userService.getUserPage(page));
+    return ResponseEntity.ok(userService.getUser(countryRegion.substring(0, 2),
+        countryRegion.substring(3, 5), seed, error, page, 10));
   }
 
 }
