@@ -25,7 +25,7 @@ public class UserRepository {
   public void initialize(String language, String country, long seed, double currError) {
     this.locale = new Locale(language, country);
     this.seed = seed;
-
+    this.random = new Random(this.seed);
     this.error = (long) Math.floor(currError);
     // the fraction part of error act asprobability of occuring one more error for
     // the current enrty
@@ -37,7 +37,7 @@ public class UserRepository {
     this.faker = new Faker(locale, random);
 
     List<User> users = new ArrayList<>();
-    for (int u = 0; u < 20; u++)
+    for (int u = 0; u < page; u++)
       users.addLast(
           this.fakeUser());
     return users;
