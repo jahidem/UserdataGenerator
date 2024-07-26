@@ -37,7 +37,7 @@ public class UserRepository {
     this.faker = new Faker(locale, random);
 
     List<User> users = new ArrayList<>();
-    for (int u = 0; u < page; u++)
+    for (int u = 0; u < number; u++)
       users.addLast(
           this.fakeUser());
     return users;
