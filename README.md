@@ -4,7 +4,7 @@ This project implements a Spring Boot web application for generating realistic f
 
 ### Features
 
-* Select from multiple regions (e.g., USA, Poland, France)
+* Select from multiple regions (e.g., USA, Mexico, Thailand)
 * Specify the number of errors per record (0-1000) with a slider and linked input field.
 * Generate random seed or enter a custom one for reproducible results.
 * View generated data in a table with infinite scrolling (20 records per page).
@@ -16,9 +16,13 @@ This project implements a Spring Boot web application for generating realistic f
 * Export generated data to CSV format.
 ### Demonstration
 
+
+https://github.com/user-attachments/assets/daa7102f-c835-4757-8735-d014fa55ecc1
+
+
 ### Requirements
 
-* Java 11+
+* Java 21+
 * Docker (for deployment)
 
 ### Running the application
